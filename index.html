@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <link rel="stylesheet" href="assets/style.css" />
+      <title>Hammington Library</title>
+   </head>
+
+   <body>
+      <header>
+         <div>
+            <h1>Hammington Library</h1>
+            <h3>Book Management</h3>
+         </div>
+      </header>
+
+      <div class="container">
+         <!-- Form Tambah/Edit Buku -->
+         <form action="" id="book-form">
+            <input type="text" id="title" placeholder="Judul Buku" required />
+            <input type="text" id="author" placeholder="Penulis" required />
+            <input type="text" id="category" placeholder="Kategori" required />
+
+            <select name="type" id="type">
+               <option value="e-book">E-book</option>
+               <option value="printed">Printed Book</option>
+            </select>
+
+            <button type="submit">Simpan Buku</button>
+         </form>
+
+         <hr />
+         <!-- Filter -->
+         <div class="filters">
+            <input
+               type="text"
+               id="search-code"
+               placeholder="Cari berdasarkan Kode Buku"
+            />
+            <input
+               type="text"
+               id="search-title"
+               placeholder="Cari berdasarkan Judul"
+            />
+            <input
+               type="text"
+               id="search-author"
+               placeholder="Cari berdasarkan Penulis"
+            />
+         </div>
+
+         <hr />
+         <!-- Tabel Buku -->
+         <table>
+            <thead>
+               <tr>
+                  <th>No</th>
+                  <th>Kode</th>
+                  <th>Judul</th>
+                  <th>Penulis</th>
+                  <th>Kategori</th>
+                  <th>Tipe</th>
+                  <th>Aksi</th>
+               </tr>
+            </thead>
+            <tbody id="book-list"></tbody>
+         </table>
+      </div>
+
+      <script type="module">
+         // Book.js
+         class Book {
+            static totalBooks = 0; // Static property untuk menghitung total buku
+
+            constructor(title, author, category, type) {
+               this.code = String(Book.totalBooks + 1).padStart(4, "0"); // Membuat kode buku unik (0001, 0002, ...)
+               this.title = title;
+               this.author = author;
+               this.category = category;
+               this.type = type;
+               Book.totalBooks++;
+            }
+         }
+
+         class Ebook extends Book {
+            constructor(title, author, category) {
+               super(title, author, category, "E-book");
+            }
+         }
+
+         class PrintedBook extends Book {
+            constructor(title, author, category) {
+               super(title, author, category, "Printed");
+            }
+         }
+
+         // Main.js
+         document
+            .getElementById("book-form")
+            .addEventListener("submit", function (event) {
+               event.preventDefault();
+
+               const title = document.getElementById("title").value;
+               const author = document.getElementById("author").value;
+               const category = document.getElementById("category").value;
+               const type = document.getElementById("type").value;
+
+               if (!title || !author || !category) {
+                  alert("Semua field harus diisi!");
+                  return;
+               }
+
+               let newBook;
+               if (type === "e-book") {
+                  newBook = new Ebook(title, author, category);
+               } else {
+                  newBook = new PrintedBook(title, author, category);
+               }
+
+               addBookToTable(newBook); // Menambahkan buku ke tabel
+               updateTotalBooks(); // Menampilkan total buku
+            });
+
+         // Menambahkan buku ke tabel
+         function addBookToTable(book) {
+            const tableBody = document.getElementById("book-list");
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                 <td>${Book.totalBooks}</td>
+                 <td>${book.code}</td>
+                 <td>${book.title}</td>
+                 <td>${book.author}</td>
+                 <td>${book.category}</td>
+                 <td>${book.type}</td>
+                 <td><button onclick="deleteBook(this)">Hapus</button></td>
+             `;
+            tableBody.appendChild(row);
+         }
+
+         // Menghapus buku dari tabel
+         function deleteBook(button) {
+            const row = button.parentNode.parentNode;
+            row.remove();
+            Book.totalBooks--;
+            updateTotalBooks();
+         }
+
+         // Memperbarui jumlah total buku
+         function updateTotalBooks() {
+            console.log(`Total Buku: ${Book.totalBooks}`);
+         }
+
+         // Pencarian Buku
+         document
+            .getElementById("search-code")
+            .addEventListener("input", searchBooks);
+         document
+            .getElementById("search-title")
+            .addEventListener("input", searchBooks);
+         document
+            .getElementById("search-author")
+            .addEventListener("input", searchBooks);
+
+         function searchBooks() {
+            const codeSearch = document
+               .getElementById("search-code")
+               .value.toLowerCase();
+            const titleSearch = document
+               .getElementById("search-title")
+               .value.toLowerCase();
+            const authorSearch = document
+               .getElementById("search-author")
+               .value.toLowerCase();
+            const rows = document.querySelectorAll("#book-list tr");
+
+            rows.forEach((row) => {
+               const code = row.cells[1].textContent.toLowerCase();
+               const title = row.cells[2].textContent.toLowerCase();
+               const author = row.cells[3].textContent.toLowerCase();
+
+               if (
+                  code.includes(codeSearch) &&
+                  title.includes(titleSearch) &&
+                  author.includes(authorSearch)
+               ) {
+                  row.style.display = "";
+               } else {
+                  row.style.display = "none";
+               }
+            });
+         }
+      </script>
+
+      <footer>
+         <p>&copy; 2025 Hammington Library. All right reserved</p>
+      </footer>
+   </body>
+</html>
