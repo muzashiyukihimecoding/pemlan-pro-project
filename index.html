@@ -62,11 +62,15 @@
                   <th>Penulis</th>
                   <th>Kategori</th>
                   <th>Tipe</th>
-                  <th>Aksi</th>
+                  <th class="action-buttons">Aksi</th>
                </tr>
             </thead>
             <tbody id="book-list"></tbody>
          </table>
+         <div class="book-counter">
+            <p>Total E-Book: <span id="total-ebook">0</span></p>
+            <p>Total Printed Book: <span id="total-printed">0</span></p>
+         </div>
       </div>
 
       <script type="module">
@@ -192,6 +196,8 @@
             });
          }
       </script>
+
+      <script type="module" src="./scripts/main.js"></script>
 
       <footer>
          <p>&copy; 2025 Hammington Library. All right reserved</p>
